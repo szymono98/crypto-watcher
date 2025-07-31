@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { RateLimitError } from "@/lib/errors";
 
 const BASE_URL = "https://api.coingecko.com/api/v3/coins/markets";
 
@@ -34,26 +35,42 @@ const fetchCoins = async ({
     price_change_percentage: "24h",
   });
   const res = await fetch(`${BASE_URL}?${params}`);
-  if (!res.ok) throw new Error("Failed to fetch coins");
+  if (res.status === 429) {
+    throw new RateLimitError(
+      "API rate limit exceeded. Please try again later."
+    );
+  }
+  if (!res.ok) {
+    const msg = `Failed to fetch coins: ${res.status} ${res.statusText}`;
+    throw new Error(msg);
+  }
   return res.json();
 };
 
-export function useTopCoins(options: UseTopCoinsOptions = {}) {
-  const { page = 1, perPage = 20, vsCurrency = "usd" } = options;
-  const query = useQuery<Coin[], Error>({
-    queryKey: ["topCoins", page, perPage, vsCurrency],
-    queryFn: () => fetchCoins({ page, perPage, vsCurrency }),
+export function useInfiniteCoins({
+  perPage = 20,
+  vsCurrency = "usd",
+}: UseTopCoinsOptions = {}) {
+  const query = useInfiniteQuery<Coin[], Error>({
+    queryKey: ["topCoins", perPage, vsCurrency],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam }) =>
+      fetchCoins({ page: pageParam as number, perPage, vsCurrency }),
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = allPages.length + 1;
+      if (lastPage.length < perPage || nextPage > 5) return undefined;
+      return nextPage;
+    },
     refetchInterval: 60000,
     gcTime: 5 * 60 * 1000,
+    retry: (failureCount, error) => {
+      if (error instanceof RateLimitError) return false;
+      return failureCount < 2;
+    },
   });
   return {
-    coins: query.data,
+    coins: query.data?.pages.flat() ?? [],
     ...query,
+    isRateLimit: query.error instanceof RateLimitError,
   };
 }
-
-// ---
-// Różnice SWR vs React Query:
-// - SWR jest prostszy, idealny do prostych fetchy i odświeżania danych (np. panel rynkowy)
-// - React Query daje więcej możliwości (mutacje, cache, paginacja, retry, obsługa błędów, optimistic updates)
-// - Do paginacji, infinite scroll i rozbudowanych interakcji (np. edycja portfela) lepiej sprawdzi się React Query
