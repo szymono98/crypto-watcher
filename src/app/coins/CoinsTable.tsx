@@ -35,58 +35,80 @@ export function CoinsTable() {
 
   return (
     <div>
-      <Card className="overflow-x-auto">
+      <Card className="overflow-x-auto bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/20 dark:border-black/30 shadow-xl rounded-2xl p-4">
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="border-b">
-              <th className="px-2 py-1 text-left">#</th>
-              <th className="px-2 py-1 text-left">Coin</th>
-              <th className="px-2 py-1 text-right">Price</th>
-              <th className="px-2 py-1 text-right">24h %</th>
-              <th className="px-2 py-1 text-right">Market Cap</th>
+            <tr>
+              <th className="px-3 py-2 text-center font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+                #
+              </th>
+              <th className="px-3 py-2 text-left font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+                Coin
+              </th>
+              <th className="px-3 py-2 text-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+                Price
+              </th>
+              <th className="px-3 py-2 text-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+                24h %
+              </th>
+              <th className="px-3 py-2 text-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+                Market Cap
+              </th>
             </tr>
           </thead>
           <tbody>
             {coins.map((coin) => (
-              <tr key={coin.id} className="border-b hover:bg-muted/50">
-                <td className="px-2 py-1">{coin.market_cap_rank}</td>
-                <td className="px-2 py-1 flex items-center gap-2">
-                  <Image
-                    src={coin.image}
-                    alt={coin.symbol}
-                    width={20}
-                    height={20}
-                    className="w-5 h-5"
-                  />
-                  <span className="font-medium">{coin.name}</span>
-                  <span className="text-xs text-muted-foreground uppercase">
+              <tr
+                key={coin.id}
+                className="hover:bg-black/5 dark:hover:bg-black/40 transition-colors duration-200 animate-fade-in"
+              >
+                <td className="px-3 py-2 font-semibold text-center">
+                  {coin.market_cap_rank}
+                </td>
+                <td className="px-3 py-2 flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-full overflow-hidden shadow-md bg-white/60 dark:bg-black/60 flex items-center justify-center">
+                    <Image
+                      src={coin.image}
+                      alt={coin.symbol}
+                      width={28}
+                      height={28}
+                    />
+                  </span>
+                  <span className="font-semibold">{coin.name}</span>
+                  <span className="text-xs text-muted-foreground uppercase opacity-60">
                     {coin.symbol}
                   </span>
                 </td>
-                <td className="px-2 py-1 text-right">
-                  ${formatPrice(coin.current_price)}
+                <td className="px-3 py-2 text-right">
+                  <span className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded-md">
+                    ${formatPrice(coin.current_price)}
+                  </span>
                 </td>
                 <td
-                  className={`px-2 py-1 text-right ${
+                  className={`px-3 py-2 text-right ${
                     coin.price_change_percentage_24h > 0
-                      ? "text-green-600"
-                      : "text-red-600"
+                      ? "text-green-500"
+                      : "text-red-500"
                   }`}
                 >
                   {coin.price_change_percentage_24h !== undefined
                     ? coin.price_change_percentage_24h.toFixed(2) + "%"
                     : "-"}
                 </td>
-                <td className="px-2 py-1 text-right">
-                  ${formatNumber(coin.market_cap)}
+                <td className="px-3 py-2 text-right">
+                  <span className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded-md">
+                    ${formatNumber(coin.market_cap)}
+                  </span>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         {(isLoading || isFetching) && hasNextPage && (
-          <div className="p-2 flex justify-center">
-            <Loader2 className="animate-spin w-6 h-6 text-muted-foreground" />
+          <div className="flex justify-center p-4">
+            <div className="bg-white/40 dark:bg-black/40 backdrop-blur-sm rounded-full p-2 animate-fade-in">
+              <Loader2 className="animate-spin w-8 h-8 text-muted-foreground" />
+            </div>
           </div>
         )}
         {isRateLimit && (
