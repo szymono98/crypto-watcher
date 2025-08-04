@@ -13,6 +13,7 @@ export interface Coin {
   market_cap_rank: number;
   total_volume: number;
   price_change_percentage_24h: number;
+  price_change_percentage_30d_in_currency: number;
 }
 
 interface UseTopCoinsOptions {
@@ -32,7 +33,7 @@ const fetchCoins = async ({
     per_page: perPage.toString(),
     page: page.toString(),
     sparkline: "false",
-    price_change_percentage: "24h",
+    price_change_percentage: "24h,30d",
   });
   const res = await fetch(`${BASE_URL}?${params}`);
   if (res.status === 429) {

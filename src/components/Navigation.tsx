@@ -1,12 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useState } from "react";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
+import { Menu, X } from "lucide-react";
 
 const ThemeToggle = dynamic(
   () =>
@@ -31,11 +34,13 @@ const ThemeToggle = dynamic(
 );
 
 export function Navigation() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <header className="border-b">
-      <nav className="container mx-auto flex items-center justify-between py-4">
+      <nav className="container mx-auto px-4 flex items-center justify-between py-4">
         <span className="font-bold text-xl">cryptoWatcher</span>
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -58,7 +63,57 @@ export function Navigation() {
           </NavigationMenu>
           <ThemeToggle />
         </div>
+
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-md hover:bg-muted/50 transition-colors"
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
+        </div>
       </nav>
+
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t bg-background/95 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4 space-y-3">
+            <Link
+              href="/"
+              className="block py-2 px-3 rounded-md hover:bg-muted/50 transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Market Panel
+            </Link>
+            <Link
+              href="/coins"
+              className="block py-2 px-3 rounded-md hover:bg-muted/50 transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Cryptocurrency Explorer
+            </Link>
+            <Link
+              href="/portfolio"
+              className="block py-2 px-3 rounded-md hover:bg-muted/50 transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              My Portfolio
+            </Link>
+            <Link
+              href="/user"
+              className="block py-2 px-3 rounded-md hover:bg-muted/50 transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              User Panel
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
