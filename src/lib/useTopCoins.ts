@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { RateLimitError } from "@/lib/errors";
+import { RateLimitError } from "./errors";
 
 const BASE_URL = "https://api.coingecko.com/api/v3/coins/markets";
 
@@ -22,7 +22,7 @@ interface UseTopCoinsOptions {
   vsCurrency?: string;
 }
 
-const fetchCoins = async ({
+export const fetchCoins = async ({
   page = 1,
   perPage = 20,
   vsCurrency = "usd",
